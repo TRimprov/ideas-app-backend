@@ -18,5 +18,9 @@
     "express": "^4.17.1",
     "mysql": "^2.18.1",
     "serverless-http": "^2.3.1"
+  },
+  "devDependencies": {
+    "eslint": "^6.8.0",
+    "serverless-offline": "^5.12.1"
   }
 }
