@@ -56,7 +56,7 @@ app.get("/suggestion", function (request, response) {
 app.get("/suggestion/:id", function (request, response) {
 
 
-    let answer = {};
+   // let answer = {};
     let id = request.params.id;
     let secondId = 0;
     let book = false;
@@ -133,7 +133,7 @@ app.get("/suggestion/:id", function (request, response) {
 
 app.get("/types", function (request, response) {
 
-    connection.query("SELECT * FROM Types", function (err, data) {
+    connection.query("SELECT * FROM Types where display = true", function (err, data) {
 
         if (err) {
             response.status(500).json({
