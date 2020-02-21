@@ -66,6 +66,8 @@ app.get("/suggestion/:id", function (request, response) {
         secondId = 7;
     }
 
+    console.log(id);
+
     connection.query("Select * from Suggestions where typeId = ?", [id], function (err, data) {
         if (err) {
             response.status(500).json({
@@ -74,6 +76,7 @@ app.get("/suggestion/:id", function (request, response) {
         }
         else {
 
+console.log(data);
             let randomSuggestion = getRandom(data, response);
 
             if (book) {
@@ -133,7 +136,8 @@ app.get("/suggestion/:id", function (request, response) {
 
 app.get("/types", function (request, response) {
 
-    connection.query("SELECT * FROM Types where display = true", function (err, data) {
+  //  connection.query("SELECT * FROM Types where display = true", function (err, data) {
+        connection.query("SELECT * FROM Types", function (err, data) {
 
         if (err) {
             response.status(500).json({
