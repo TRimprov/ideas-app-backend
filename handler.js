@@ -123,18 +123,79 @@ app.get("/suggestion/:id", function (request, response) {
             // closing if book
             }
             else if( insult){
+                // getting a 9 - noun
+                connection.query("Select * from Suggestions where typeId = ?", [secondId], function (err, data) {
+                    if (err) {
+                        response.status(500).json({
+                            error: err
+                        })
+                    }
+                    else {
 
-            //  let answer = 'The '.concat(nextBit.suggestion, ' ', randomSuggestion.suggestion  );
-                //     console.log(answer);
-                      let answer = 'This is an insult';
+                        let noun = getRandom(data, response);
 
-            randomSuggestion = { id: null, suggestion: answer, typeId: id, favourite: null}
 
-                response.status(200).json(
-                    {
-                        suggestion: randomSuggestion
-                    });
+                        connection.query("Select * from Suggestions where typeId = ?", [thirdId], function (err, data) {
+                            if (err) {
+                                response.status(500).json({
+                                    error: err
+                                })
+                            }
+                            else {
 
+                                let verb = getRandom(data, response);
+
+                                let answer = 'you make '.concat(verb);
+
+                                response.status(200).json(
+                                    {
+                                        suggestion: { id: null, suggestion: answer, typeId: id, favourite: null}
+                                    });
+
+                    // console.log(answer);
+                    //         let answer = 'This is an insult too';
+
+                    //          randomSuggestion = { id: null, suggestion: answer, typeId: id, favourite: null}
+
+                    //          response.status(200).json(
+                    //         {
+                    //             suggestion: randomSuggestion
+
+                    //          });
+        
+                                //         let nextBit = getRandom(data, response);
+        
+                                //       //  console.log(nextBit);
+        
+                                //         let answer = 'The '.concat(nextBit.suggestion, ' ', randomSuggestion.suggestion  );
+                                //    //     console.log(answer);
+        
+                                //         randomSuggestion = { id: null, suggestion: answer, typeId: id, favourite: null}
+                                //         console.log("to start with in here its ", randomSuggestion);
+                                //         response.status(200).json(
+                                //             {
+                                //                 suggestion: randomSuggestion
+                                //             });
+                               
+                            // closing inside else
+                            }
+                       //closing insult second inside conn quiery     }
+                        })
+                    
+                    
+                       
+                    // closing inside else
+                    }
+               //closing inssult first inside conn quiery     }
+                })
+            
+            
+
+
+
+
+
+            // closing if insult
             }
             else{
 
