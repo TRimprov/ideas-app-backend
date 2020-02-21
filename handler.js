@@ -59,11 +59,22 @@ app.get("/suggestion/:id", function (request, response) {
    // let answer = {};
     let id = request.params.id;
     let secondId = 0;
+    let thirdId = 0;
     let book = false;
+    let insult = false;
+
     if (id == 4 || id == 5) {
         book = true;
         id = 3;
         secondId = 7;
+    }
+
+    if (id == 6 )
+    {
+        insult = true;
+        id = 8;
+        secondId = 9;
+        thirdId = 10;
     }
 
     console.log(id);
@@ -76,7 +87,7 @@ app.get("/suggestion/:id", function (request, response) {
         }
         else {
 
-console.log(data);
+//console.log(data);
             let randomSuggestion = getRandom(data, response);
 
             if (book) {
@@ -110,6 +121,20 @@ console.log(data);
             
 
             // closing if book
+            }
+            else if( insult){
+
+            //  let answer = 'The '.concat(nextBit.suggestion, ' ', randomSuggestion.suggestion  );
+                //     console.log(answer);
+                      let answer = 'This is an insult';
+
+            randomSuggestion = { id: null, suggestion: answer, typeId: id, favourite: null}
+
+                response.status(200).json(
+                    {
+                        suggestion: randomSuggestion
+                    });
+
             }
             else{
 

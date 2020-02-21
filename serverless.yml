@@ -1,13 +1,8 @@
-org: carlytarett
-app: frontend-local-improv-app
 service: frontend-local-improv
 provider:
   name: aws
   region: eu-west-1
   runtime: nodejs12.x
-
-plugins:
-  - serverless-offline
 
 functions:
   suggestion:
