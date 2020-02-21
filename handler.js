@@ -246,6 +246,25 @@ app.get("/types", function (request, response) {
     });
 });
 
+app.get("/creatableTypes", function (request, response) {
+
+        connection.query("SELECT * FROM Types where display = true", function (err, data) {
+         // connection.query("SELECT * FROM Types", function (err, data) {
+  
+          if (err) {
+              response.status(500).json({
+                  error: err
+              })
+          }
+          else {
+              response.status(200).json(
+                  {
+                      types: data
+                  });
+          };
+      });
+  });
+
 
 // POST 
 

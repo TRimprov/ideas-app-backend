@@ -25,6 +25,10 @@ functions:
           path: types  
           cors: true
       - http:
+          method: get
+          path: creatableTypes  
+          cors: true
+      - http:
           method: put
           path: suggestion/{id}
           cors: true
