@@ -132,7 +132,10 @@ app.get("/suggestion/:id", function (request, response) {
                     }
                     else {
 
-                        let noun = getRandom(data, response);
+                        let nounObject = getRandom(data, response);
+                        let noun = nounObject.suggestion;
+
+                        console.log("noun is : ", noun)
 
 
                         connection.query("Select * from Suggestions where typeId = ?", [thirdId], function (err, data) {
@@ -143,9 +146,13 @@ app.get("/suggestion/:id", function (request, response) {
                             }
                             else {
 
-                                let verb = getRandom(data, response);
 
-                                let answer = 'you make '.concat(verb);
+console.log("I still know ", noun)
+                                let verbObject = getRandom(data, response);
+                                let verb = verbObject.suggestion;
+                                let randomSuggestionAdjective = randomSuggestion.suggestion;
+
+                                let answer = 'You\'re so ' .concat(randomSuggestionAdjective, ' you make ', noun, ' ', verb);
 
                                 response.status(200).json(
                                     {
