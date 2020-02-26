@@ -38,19 +38,43 @@ app.get("/suggestion", function (request, response) {
                 {
                     suggestion: randomSuggestion
                 });
-
         };
     });
 
 });
+
+function getPlay(){
+    
+}
 
 app.get("/suggestion/:id", function (request, response) {
 
     let id = request.params.id;
     let secondId = 0;
     let thirdId = 0;
+    const BOOK_TYPE = "Book Title";
+    const PLAY_TYPE = "Play Title"
+    const INSULT = "Insult";
+    let bookId = 0;
+    let playId = 0;
+    let insultId = 0;
     let book = false;
     let insult = false;
+
+    //get book id
+    connection.query("Select typeId from Types where type = ?", [BOOK_TYPE], function (err, data) {
+
+        if (err) {
+            response.status(500).json({
+                error: err
+            })
+        }
+        else {
+            bookId = data[0].typeId;
+            console.log(bookId);
+         
+        };
+    });
 
     if (id == 4 || id == 5) {
         book = true;
@@ -89,6 +113,7 @@ app.get("/suggestion/:id", function (request, response) {
 
                         randomSuggestion = { id: null, suggestion: answer, typeId: id, favourite: null }
                         console.log("to start with in here its ", randomSuggestion);
+
                         response.status(200).json(
                             {
                                 suggestion: randomSuggestion
@@ -97,7 +122,6 @@ app.get("/suggestion/:id", function (request, response) {
                     }
 
                 })
-
 
             }
             else if (insult) {
