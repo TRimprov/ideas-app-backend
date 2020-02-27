@@ -24,6 +24,8 @@ function getRandom(data, response) {
 
 app.get("/suggestion", function (request, response) {
 
+    console.log("def in the new branch");
+
     connection.query("SELECT * FROM Suggestions", function (err, data) {
 
         if (err) {
@@ -43,11 +45,93 @@ app.get("/suggestion", function (request, response) {
 
 });
 
-function getPlay(){
-    
+function completeBookTitle(secondId, randomSuggestion, response){
+
+    connection.query("Select * from Suggestions where typeId = ?", [secondId], function (err, data) {
+        if (err) {
+            response.status(500).json({
+                error: err
+            })
+        }
+        else {
+
+            console.log("got book data next bit ")
+
+           // let nextBit = getRandom(data, response);
+            let nextBit = getRandom(data);
+
+            console.log(nextBit)
+
+
+            let answer = 'The '.concat(nextBit.suggestion, ' ', randomSuggestion.suggestion);
+
+          //  randomSuggestion = { id: null, suggestion: answer, typeId: id, favourite: null }
+        randomSuggestion = { id: null, suggestion: answer, typeId: 4, favourite: null }
+
+            console.log("to start with in here its ", randomSuggestion);
+
+            response.status(200).json(
+                {
+                    suggestion: randomSuggestion
+                });
+
+        }
+
+    })
+
+
+}
+
+function  getThird(thirdId, randomSuggestion, noun, response){
+
+    console.log("got into get third")
+    connection.query("Select * from Suggestions where typeId = ?", [thirdId], function (err, data) {
+        if (err) {
+            response.status(500).json({
+                error: err
+            })
+        }
+        else {
+
+            let verbObject = getRandom(data, response);
+            let verb = verbObject.suggestion;
+            let randomSuggestionAdjective = randomSuggestion.suggestion;
+
+            let answer = 'You\'re so '.concat(randomSuggestionAdjective, ' you make ', noun, ' ', verb);
+
+            response.status(200).json(
+                {
+                    suggestion: { id: null, suggestion: answer, typeId: 6, favourite: null }
+                });
+        }
+
+    })
+}
+
+function completeInsult(secondId, thirdId, randomSuggestion, response){
+
+    console.log("got into complete insult")
+    connection.query("Select * from Suggestions where typeId = ?", [secondId], function (err, data) {
+        if (err) {
+            response.status(500).json({
+                error: err
+            })
+        }
+        else {
+
+            let nounObject = getRandom(data, response);
+            let noun = nounObject.suggestion;
+
+            getThird(thirdId, randomSuggestion, noun, response);
+
+        }
+
+    })
 }
 
 app.get("/suggestion/:id", function (request, response) {
+
+    console.log("def in the new branch");
 
     let id = request.params.id;
     let secondId = 0;
@@ -55,9 +139,9 @@ app.get("/suggestion/:id", function (request, response) {
     const BOOK_TYPE = "Book Title";
     const PLAY_TYPE = "Play Title"
     const INSULT = "Insult";
-    let bookId = 0;
-    let playId = 0;
-    let insultId = 0;
+    let bookId = 4;
+    let playId = 5;
+    let insultId = 6;
     let book = false;
     let insult = false;
 
@@ -76,7 +160,7 @@ app.get("/suggestion/:id", function (request, response) {
         };
     });
 
-    if (id == 4 || id == 5) {
+    if (id == 4 ||  id == 5) {
         book = true;
         id = 3;
         secondId = 7;
@@ -99,69 +183,17 @@ app.get("/suggestion/:id", function (request, response) {
             let randomSuggestion = getRandom(data, response);
 
             if (book) {
-                connection.query("Select * from Suggestions where typeId = ?", [secondId], function (err, data) {
-                    if (err) {
-                        response.status(500).json({
-                            error: err
-                        })
-                    }
-                    else {
 
-                        let nextBit = getRandom(data, response);
+                console.log("in book");
 
-                        let answer = 'The '.concat(nextBit.suggestion, ' ', randomSuggestion.suggestion);
 
-                        randomSuggestion = { id: null, suggestion: answer, typeId: id, favourite: null }
-                        console.log("to start with in here its ", randomSuggestion);
-
-                        response.status(200).json(
-                            {
-                                suggestion: randomSuggestion
-                            });
-
-                    }
-
-                })
-
+                        completeBookTitle(secondId, randomSuggestion, response);
             }
             else if (insult) {
 
-                connection.query("Select * from Suggestions where typeId = ?", [secondId], function (err, data) {
-                    if (err) {
-                        response.status(500).json({
-                            error: err
-                        })
-                    }
-                    else {
+                console.log("its in insult")
 
-                        let nounObject = getRandom(data, response);
-                        let noun = nounObject.suggestion;
-
-                        connection.query("Select * from Suggestions where typeId = ?", [thirdId], function (err, data) {
-                            if (err) {
-                                response.status(500).json({
-                                    error: err
-                                })
-                            }
-                            else {
-
-                                let verbObject = getRandom(data, response);
-                                let verb = verbObject.suggestion;
-                                let randomSuggestionAdjective = randomSuggestion.suggestion;
-
-                                let answer = 'You\'re so '.concat(randomSuggestionAdjective, ' you make ', noun, ' ', verb);
-
-                                response.status(200).json(
-                                    {
-                                        suggestion: { id: null, suggestion: answer, typeId: id, favourite: null }
-                                    });
-                            }
-
-                        })
-
-                    }
-
-                })
+                    completeInsult(secondId, thirdId, randomSuggestion, response);
 
             }
             else {
