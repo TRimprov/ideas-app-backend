@@ -21,7 +21,7 @@ const connection = mysql.createConnection({
     database: "improv"
 });
 
-function getRandom(data, response) {
+function getRandom(data) {
 
     let randomPostion = Math.floor(Math.random() * data.length);
     return data[randomPostion];
@@ -40,14 +40,13 @@ app.get("/suggestion", function (request, response) {
         }
         else {
 
-            let randomSuggestion = getRandom(data, response);
+            let randomSuggestion = getRandom(data);
             response.status(200).json(
                 {
                     suggestion: randomSuggestion
                 });
         };
     });
-
 });
 
 function completeBookTitle(secondId, bookNounObject, response) {
@@ -86,7 +85,7 @@ function getInsultVerb(insultVerbId, randomSuggestion, insultNoun, response) {
         }
         else {
 
-            let verbObject = getRandom(data, response);
+            let verbObject = getRandom(data);
             let verb = verbObject.suggestion;
             let insultAdjective = randomSuggestion.suggestion;
 
@@ -97,7 +96,6 @@ function getInsultVerb(insultVerbId, randomSuggestion, insultNoun, response) {
                     suggestion: { id: null, suggestion: insult, typeId: 6, favourite: null }
                 });
         }
-
     })
 }
 
@@ -111,12 +109,11 @@ function completeInsult(insultNounId, insultVerbId, randomSuggestion, response) 
             })
         }
         else {
-            let insultNounObject = getRandom(data, response);
+            let insultNounObject = getRandom(data);
             let insultNoun = insultNounObject.suggestion;
 
             getInsultVerb(insultVerbId, randomSuggestion, insultNoun, response);
         }
-
     })
 }
 
@@ -125,45 +122,51 @@ app.get("/suggestion/:id", function (request, response) {
     console.log("def in the new branch");
 
     let id = request.params.id;
-    let secondId = 0;
-    let thirdId = 0;
 
+//I would like to get these from the database - just investigating if I need to do this every time 
+    let simpleNounId = 3;
     let bookId = 4;
-    let bookNounId = 0;
-
+    let playId = 5;
     let insultId = 6;
+    let simpleAdjectiveId = 7;
+    let longAdjectiveId = 8;
+    let longNounId = 9;
+    let longVerbId = 10;
+// *************************************
+
+
+    let bookNounId = 0;
     let insultNounId = 0;
     let insultVerbId = 0;
-    let playId = 5;
+  
     let book = false;
     let insult = false;
 
-    //get book id
-    connection.query("Select typeId from Types where type = ?", [BOOK_TYPE], function (err, data) {
 
-        if (err) {
-            response.status(500).json({
-                error: err
-            })
-        }
-        else {
-            bookId = data[0].typeId;
-            console.log(bookId);
+    //Update this to get all types then nest remaining code in the else
+    // connection.query("Select typeId from Types where type = ?", [BOOK_TYPE], function (err, data) {
 
-        };
-    });
+    //     if (err) {
+    //         response.status(500).json({
+    //             error: err
+    //         })
+    //     }
+    //     else {
+    //         bookId = data[0].typeId;
+    //     };
+    // });
 
-    if (id == 4 || id == 5) {
+    if (id == bookId || id == playId) {
         book = true;
-        id = 3;
-        bookNounId = 7;
+        id = simpleNounId;
+        bookNounId = simpleAdjectiveId;
     }
 
-    if (id == 6) {
+    if (id == insultId) {
         insult = true;
-        id = 8;
-        insultNounId = 9;
-        insultVerbId = 10;
+        id = longAdjectiveId;
+        insultNounId = longNounId;
+        insultVerbId = longVerbId;
     }
 
     connection.query("Select * from Suggestions where typeId = ?", [id], function (err, data) {
@@ -173,7 +176,7 @@ app.get("/suggestion/:id", function (request, response) {
             })
         }
         else {
-            let randomSuggestion = getRandom(data, response);
+            let randomSuggestion = getRandom(data);
 
             if (book) {
 
@@ -197,7 +200,6 @@ app.get("/suggestion/:id", function (request, response) {
             }
         }
     });
-
 });
 
 
@@ -254,7 +256,6 @@ app.post("/suggestion", function (request, response) {
             response.status(201).json(newSuggestion);
         }
     });
-
 });
 
 app.put("/suggestion/:id", function (request, response) {
@@ -274,7 +275,6 @@ app.put("/suggestion/:id", function (request, response) {
             });
         }
     });
-
 });
 
 app.delete("/suggestion/:id", function (request, response) {
