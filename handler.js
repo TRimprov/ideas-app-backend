@@ -6,6 +6,11 @@ const mysql = require("mysql");
 
 const app = express();
 
+const BOOK_TYPE = "Book Title";
+const PLAY_TYPE = "Play Title"
+const INSULT = "Insult";
+
+
 app.use(cors());
 app.use(bodyParser.json());
 
@@ -45,7 +50,7 @@ app.get("/suggestion", function (request, response) {
 
 });
 
-function completeBookTitle(secondId, randomSuggestion, response){
+function completeBookTitle(secondId, bookNounObject, response) {
 
     connection.query("Select * from Suggestions where typeId = ?", [secondId], function (err, data) {
         if (err) {
@@ -55,37 +60,25 @@ function completeBookTitle(secondId, randomSuggestion, response){
         }
         else {
 
-            console.log("got book data next bit ")
+            let bookAdjective = getRandom(data);
 
-           // let nextBit = getRandom(data, response);
-            let nextBit = getRandom(data);
+            let bookTitle = 'The '.concat(bookAdjective.suggestion, ' ', bookNounObject.suggestion);
 
-            console.log(nextBit)
-
-
-            let answer = 'The '.concat(nextBit.suggestion, ' ', randomSuggestion.suggestion);
-
-          //  randomSuggestion = { id: null, suggestion: answer, typeId: id, favourite: null }
-        randomSuggestion = { id: null, suggestion: answer, typeId: 4, favourite: null }
-
-            console.log("to start with in here its ", randomSuggestion);
+            //  randomSuggestion = { id: null, suggestion: answer, typeId: id, favourite: null }
+            let bookTitleObject = { id: null, suggestion: bookTitle, typeId: 4, favourite: null }
 
             response.status(200).json(
                 {
-                    suggestion: randomSuggestion
+                    suggestion: bookTitleObject
                 });
-
         }
-
     })
-
-
 }
 
-function  getThird(thirdId, randomSuggestion, noun, response){
+function getInsultVerb(insultVerbId, randomSuggestion, insultNoun, response) {
 
     console.log("got into get third")
-    connection.query("Select * from Suggestions where typeId = ?", [thirdId], function (err, data) {
+    connection.query("Select * from Suggestions where typeId = ?", [insultVerbId], function (err, data) {
         if (err) {
             response.status(500).json({
                 error: err
@@ -95,35 +88,33 @@ function  getThird(thirdId, randomSuggestion, noun, response){
 
             let verbObject = getRandom(data, response);
             let verb = verbObject.suggestion;
-            let randomSuggestionAdjective = randomSuggestion.suggestion;
+            let insultAdjective = randomSuggestion.suggestion;
 
-            let answer = 'You\'re so '.concat(randomSuggestionAdjective, ' you make ', noun, ' ', verb);
+            let insult = 'You\'re so '.concat(insultAdjective, ' you make ', insultNoun, ' ', verb);
 
             response.status(200).json(
                 {
-                    suggestion: { id: null, suggestion: answer, typeId: 6, favourite: null }
+                    suggestion: { id: null, suggestion: insult, typeId: 6, favourite: null }
                 });
         }
 
     })
 }
 
-function completeInsult(secondId, thirdId, randomSuggestion, response){
+function completeInsult(insultNounId, insultVerbId, randomSuggestion, response) {
 
     console.log("got into complete insult")
-    connection.query("Select * from Suggestions where typeId = ?", [secondId], function (err, data) {
+    connection.query("Select * from Suggestions where typeId = ?", [insultNounId], function (err, data) {
         if (err) {
             response.status(500).json({
                 error: err
             })
         }
         else {
+            let insultNounObject = getRandom(data, response);
+            let insultNoun = insultNounObject.suggestion;
 
-            let nounObject = getRandom(data, response);
-            let noun = nounObject.suggestion;
-
-            getThird(thirdId, randomSuggestion, noun, response);
-
+            getInsultVerb(insultVerbId, randomSuggestion, insultNoun, response);
         }
 
     })
@@ -136,12 +127,14 @@ app.get("/suggestion/:id", function (request, response) {
     let id = request.params.id;
     let secondId = 0;
     let thirdId = 0;
-    const BOOK_TYPE = "Book Title";
-    const PLAY_TYPE = "Play Title"
-    const INSULT = "Insult";
+
     let bookId = 4;
-    let playId = 5;
+    let bookNounId = 0;
+
     let insultId = 6;
+    let insultNounId = 0;
+    let insultVerbId = 0;
+    let playId = 5;
     let book = false;
     let insult = false;
 
@@ -156,21 +149,21 @@ app.get("/suggestion/:id", function (request, response) {
         else {
             bookId = data[0].typeId;
             console.log(bookId);
-         
+
         };
     });
 
-    if (id == 4 ||  id == 5) {
+    if (id == 4 || id == 5) {
         book = true;
         id = 3;
-        secondId = 7;
+        bookNounId = 7;
     }
 
     if (id == 6) {
         insult = true;
         id = 8;
-        secondId = 9;
-        thirdId = 10;
+        insultNounId = 9;
+        insultVerbId = 10;
     }
 
     connection.query("Select * from Suggestions where typeId = ?", [id], function (err, data) {
@@ -186,14 +179,13 @@ app.get("/suggestion/:id", function (request, response) {
 
                 console.log("in book");
 
-
-                        completeBookTitle(secondId, randomSuggestion, response);
+                completeBookTitle(bookNounId, randomSuggestion, response);
             }
             else if (insult) {
 
                 console.log("its in insult")
 
-                    completeInsult(secondId, thirdId, randomSuggestion, response);
+                completeInsult(insultNounId, insultVerbId, randomSuggestion, response);
 
             }
             else {
@@ -202,7 +194,6 @@ app.get("/suggestion/:id", function (request, response) {
                     {
                         suggestion: randomSuggestion
                     });
-
             }
         }
     });
